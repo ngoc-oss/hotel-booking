@@ -129,6 +129,83 @@ services:
     depends_on:
       db:
         condition: service_healthy
+  prometheus:
+    restart: unless-stopped
+    security_opt: *id001
+    logging: *id002
+    image: prom/prometheus:v3.5.0
+    command:
+    - --config.file=/etc/prometheus/prometheus.yml
+    - --storage.tsdb.path=/prometheus
+    - --storage.tsdb.retention.time=15d
+    ports:
+    - 127.0.0.1:9090:9090
+    volumes:
+    - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    - ./monitoring/alerts.yml:/etc/prometheus/alerts.yml:ro
+    - promdata:/prometheus
+    networks:
+    - observe
+    cap_drop:
+    - ALL
+  grafana:
+    restart: unless-stopped
+    security_opt: *id001
+    logging: *id002
+    image: grafana/grafana:12.1.1
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
+      GF_USERS_ALLOW_SIGN_UP: 'false'
+    ports:
+    - 127.0.0.1:3000:3000
+    volumes:
+    - grafana:/var/lib/grafana
+    - ./monitoring/provisioning:/etc/grafana/provisioning:ro
+    - ./monitoring/dashboards:/var/lib/grafana/dashboards:ro
+    networks:
+    - observe
+    cap_drop:
+    - ALL
+  nginx-exporter:
+    restart: unless-stopped
+    security_opt: *id001
+    logging: *id002
+    image: nginx/nginx-prometheus-exporter:1.5.1
+    command:
+    - --nginx.scrape-uri=http://nginx:8081/stub_status
+    networks:
+    - observe
+    cap_drop:
+    - ALL
+  postgres-exporter:
+    restart: unless-stopped
+    security_opt: *id001
+    logging: *id002
+    image: prometheuscommunity/postgres-exporter:v0.17.1
+    environment:
+      DATA_SOURCE_NAME: postgresql://hotel_monitor:${MONITOR_PASSWORD}@db:5432/hotel?sslmode=disable
+    networks:
+    - data
+    - observe
+    cap_drop:
+    - ALL
+  cadvisor:
+    restart: unless-stopped
+    security_opt: *id001
+    logging: *id002
+    image: gcr.io/cadvisor/cadvisor:v0.52.1
+    volumes:
+    - /:/rootfs:ro
+    - /var/run:/var/run:ro
+    - /sys:/sys:ro
+    - /var/lib/docker:/var/lib/docker:ro
+    - /dev/disk:/dev/disk:ro
+    privileged: true
+    devices:
+    - /dev/kmsg:/dev/kmsg
+    networks:
+    - observe
 networks:
   edge: {}
   data:

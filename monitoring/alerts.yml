@@ -1,0 +1,17 @@
+groups:
+- name: hotel
+  rules:
+  - alert: TargetDown
+    annotations:
+      summary: Exporter {{ $labels.job }} unavailable
+    expr: up == 0
+    for: 1m
+    labels:
+      severity: critical
+  - alert: PostgresDown
+    annotations:
+      summary: Database connection unavailable
+    expr: pg_up == 0
+    for: 1m
+    labels:
+      severity: critical
