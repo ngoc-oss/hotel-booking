@@ -1,0 +1,1 @@
+{% extends 'base.html' %}{% block content %}<div class="card" style="max-width:480px;margin:auto"><h2>Chào mừng trở lại</h2><form method="post">{% csrf_token %}{{form.as_p}}<button>Đăng nhập</button></form><p>Chưa có tài khoản? <a href="/signup/">Đăng ký</a></p></div>{% endblock %}

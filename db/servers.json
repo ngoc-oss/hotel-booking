@@ -1,0 +1,13 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "Hotel PostgreSQL",
+      "Group": "Hotel",
+      "Host": "db",
+      "Port": 5432,
+      "MaintenanceDB": "hotel",
+      "Username": "hotel_owner",
+      "SSLMode": "prefer"
+    }
+  }
+}
