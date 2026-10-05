@@ -1,0 +1,15 @@
+name: Django checks
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - run: python manage.py check && python manage.py test -v 2
+        env:
+          TEST_SQLITE: '1'
+      - run: python scripts/setup.py && docker compose config --quiet

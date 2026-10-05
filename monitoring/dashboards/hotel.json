@@ -264,6 +264,27 @@
           "placement": "bottom"
         }
       }
+    },
+    {
+      "id": 9,
+      "title": "Nginx access logs",
+      "type": "logs",
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 32,
+        "w": 24,
+        "h": 9
+      },
+      "targets": [
+        {
+          "expr": "{job=\"nginx\",filename=\"/var/log/nginx/access.log\"}",
+          "refId": "A"
+        }
+      ]
     }
   ]
 }
