@@ -22,7 +22,7 @@ except urllib.error.HTTPError as e: assert e.code==404
 get('http://localhost:3000/api/health'); print('PASS: Grafana health')
 # Internal Loki read through existing Grafana container, no host port exposed.
 for i in range(12):
- r=subprocess.run(['docker','compose','exec','-T','grafana','wget','-qO-','http://loki:3100/loki/api/v1/label/job/values'],capture_output=True,text=True)
+ r=subprocess.run(['docker','compose','exec','-T','grafana','wget','-qO-','http://loki:3100/loki/api/v1/label/job/values'],stdout=subprocess.PIPE,stderr=subprocess.PIPE,universal_newlines=True)
  if r.returncode==0 and 'nginx' in json.loads(r.stdout).get('data',[]): break
  time.sleep(5)
 else: raise SystemExit('FAIL: no nginx stream in Loki; inspect promtail/loki logs')
