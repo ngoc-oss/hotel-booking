@@ -21,27 +21,49 @@ python3 scripts/verify.py
 Nếu lệnh docker thiếu quyền, dùng sudo hoặc cấu hình Docker group theo tài liệu chính thức; không chạy chmod 777 Docker socket.
 
 ## 3. Địa chỉ và tài khoản
-| Thành phần | URL trên Ubuntu | Tài khoản |
+| Thành phần | URL trên Windows | Tài khoản |
 |---|---|---|
-| Website | http://localhost:8080 | Tự đăng ký |
-| Quản trị | http://localhost:8080/admin/ | admin / ADMIN_PASSWORD |
-| pgAdmin | http://localhost:5050 | PGADMIN_EMAIL / PGADMIN_PASSWORD |
-| Grafana | http://localhost:3000 | admin / GRAFANA_PASSWORD |
-| Prometheus | http://localhost:9090 | Chỉ bind localhost |
+| Website | http://192.168.168.129:8080 | Tự đăng ký |
+| Quản trị website | http://192.168.168.129:8080/admin/ | admin / giá trị ADMIN_PASSWORD trong .env |
+| pgAdmin | http://127.0.0.1:15050 | giá trị PGADMIN_EMAIL / PGADMIN_PASSWORD trong .env |
+| Grafana | http://127.0.0.1:13001 | admin / giá trị GRAFANA_PASSWORD trong .env |
+| Prometheus | http://127.0.0.1:19090/targets | Không yêu cầu đăng nhập |
 
 Mật khẩu thực nằm trong `.env`; `cat .env` để xem riêng, không chụp hoặc đưa lên GitHub. Mỗi mật khẩu do setup sinh ngẫu nhiên 48 ký tự hex. File mẫu không chứa tài khoản đăng nhập thật.
 Trong pgAdmin mở **Servers → Hotel → Hotel PostgreSQL**, nhập OWNER_PASSWORD. Host là `db`, port 5432, DB `hotel`, user `hotel_owner`. Xem Schemas → public → Tables → booking_room / booking_booking / auth_user. Không dùng superuser cho ứng dụng.
 
 ## 4. Truy cập từ Windows vào máy Ubuntu
-Lấy IP bằng `hostname -I`. Thêm IP Ubuntu vào ALLOWED_HOSTS và `http://IP_UBUNTU:8080` vào CSRF_TRUSTED_ORIGINS trong `.env`, sau đó:
+
+IP Ubuntu hiện tại: `192.168.168.129`. Kiểm tra IP trên Ubuntu bằng:
+
 ```bash
-docker compose up -d --force-recreate web
+hostname -I
 ```
-Website mở `http://IP_UBUNTU:8080`. Các trang quản trị hạ tầng chỉ bind localhost; mở PowerShell tạo SSH tunnel:
+
+Nếu IP thay đổi, cập nhật `ALLOWED_HOSTS` và `CSRF_TRUSTED_ORIGINS` trong `.env` theo IP mới. Sau đó chạy trên Ubuntu, tại thư mục dự án:
+
+```bash
+sudo docker compose -f compose.yaml -f compose.override.yaml up -d --force-recreate web
+```
+
+Truy cập website từ trình duyệt Windows:
+- Website: http://192.168.168.129:8080
+- Quản trị website: http://192.168.168.129:8080/admin/
+
+Grafana, pgAdmin và Prometheus chỉ mở cổng trên localhost của Ubuntu. Để truy cập từ Windows, mở PowerShell Windows và chạy:
+
 ```powershell
-ssh -L 3000:127.0.0.1:3000 -L 5050:127.0.0.1:5050 -L 9090:127.0.0.1:9090 USER@IP_UBUNTU
+ssh -N -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -L 127.0.0.1:13001:127.0.0.1:3000 -L 127.0.0.1:15050:127.0.0.1:5050 -L 127.0.0.1:19090:127.0.0.1:9090 ngoc26@192.168.168.129
 ```
-Giữ cửa sổ SSH, mở localhost:3000/5050/9090 trên Windows. Cần SSH server hoạt động trên Ubuntu.
+
+Nhập mật khẩu tài khoản Ubuntu `ngoc26`. Khi nhập mật khẩu, terminal không hiển thị ký tự. Sau khi kết nối, cửa sổ đứng yên là bình thường.
+
+Giữ cửa sổ PowerShell này mở, không nhấn Ctrl+C trong lúc sử dụng:
+- Grafana: http://127.0.0.1:13001
+- pgAdmin: http://127.0.0.1:15050
+- Prometheus: http://127.0.0.1:19090/targets
+
+Ubuntu cần có SSH server đang hoạt động. Nếu các cổng trên đang được tunnel cũ sử dụng, đóng tunnel cũ trước khi chạy lệnh mới. Khi IP Ubuntu thay đổi, cập nhật IP trong các URL website và lệnh SSH.
 
 ## 5. Demo nghiệp vụ
 1. Đăng ký hai tài khoản, đăng nhập tài khoản thứ nhất.
