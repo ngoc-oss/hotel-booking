@@ -62,8 +62,14 @@ Grafana đã provision sẵn hai datasource và dashboard **Hotel / Hotel · Ope
 - cAdvisor là **ngoại lệ có quyền cao** để đọc host metrics; chỉ dùng trong VM lab tin cậy, không publish port. Mount socket read-only không biến Docker API thành read-only. Không tuyên bố mọi container đều non-root hoặc không đặc quyền.
 - Bản này dùng HTTP + security headers (đúng phương án đề cho phép). Khi đưa lên Internet cần TLS, cookie Secure, rate limiting và rà soát cập nhật phiên bản.
 
-## 8. GitHub và 3 commit
-Gói ZIP kèm `.git` với 3 commit theo ba mốc. Tác giả là Project Builder, không giả danh sinh viên. Điền tài khoản và thông tin của bạn trước khi dùng. Xem `docs/GITHUB.md`. Không có repository online được tạo sẵn và không có tài khoản GitHub sinh viên được tạo thay bạn.
+## 8. GitHub và lịch sử commit
+Repository: https://github.com/ngoc-oss/hotel-booking
+
+- Commit 1: Triển khai website, PostgreSQL, pgAdmin và Nginx.
+- Commit 2: Tích hợp Prometheus, Grafana và dashboard giám sát.
+- Commit 3: Tích hợp Loki, Promtail, LogQL và hardening.
+- Commit bổ sung: Sửa cấu hình truy cập Grafana và Prometheus qua localhost.
+File .env chứa mật khẩu được gitignore và không đưa lên GitHub.
 
 ## 9. Dừng, mở lại, sao lưu
 ```bash
